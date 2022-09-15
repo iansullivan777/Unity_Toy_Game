@@ -12,8 +12,9 @@ namespace StarterAssets
 		public Vector2 look;
 		public bool jump;
 		public bool sprint;
+        public bool ragdoll;
 
-		[Header("Movement Settings")]
+        [Header("Movement Settings")]
 		public bool analogMovement;
 
 		[Header("Mouse Cursor Settings")]
@@ -39,14 +40,19 @@ namespace StarterAssets
 			JumpInput(value.isPressed);
 		}
 
-		public void OnSprint(InputValue value)
-		{
-			SprintInput(value.isPressed);
-		}
+        public void OnSprint(InputValue value)
+        {
+            SprintInput(value.isPressed);
+        }
+
+        public void OnRagdoll(InputValue value)
+        {
+            RagdollInput();
+        }
 #endif
 
 
-		public void MoveInput(Vector2 newMoveDirection)
+        public void MoveInput(Vector2 newMoveDirection)
 		{
 			move = newMoveDirection;
 		} 
@@ -65,8 +71,11 @@ namespace StarterAssets
 		{
 			sprint = newSprintState;
 		}
-
-		private void OnApplicationFocus(bool hasFocus)
+        public void RagdollInput()
+        {
+            ragdoll = !ragdoll;
+        }
+        private void OnApplicationFocus(bool hasFocus)
 		{
 			SetCursorState(cursorLocked);
 		}
