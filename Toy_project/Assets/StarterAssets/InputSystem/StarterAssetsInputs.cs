@@ -12,7 +12,6 @@ namespace StarterAssets
 		public Vector2 look;
 		public bool jump;
 		public bool sprint;
-        public bool ragdoll;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -44,12 +43,6 @@ namespace StarterAssets
 		{
 			SprintInput(value.isPressed);
 		}
-
-        public void OnRagdoll(InputValue value)
-        {
-            RagdollInput();
-        }
-
 #endif
 
 
@@ -72,11 +65,6 @@ namespace StarterAssets
 		{
 			sprint = newSprintState;
 		}
-
-        public void RagdollInput()
-        {
-            ragdoll = !ragdoll;
-        }
 
 		private void OnApplicationFocus(bool hasFocus)
 		{
