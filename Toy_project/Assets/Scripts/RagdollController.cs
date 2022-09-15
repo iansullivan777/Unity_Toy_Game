@@ -5,6 +5,7 @@ using System.Linq;
 
 public class RagdollController : MonoBehaviour
 {
+    GameObject hips;
     Collider mainCollider;
     Rigidbody mainRigidbody;
     Animator anim;
@@ -16,6 +17,8 @@ public class RagdollController : MonoBehaviour
         mainRigidbody = this.gameObject.GetComponent<Rigidbody>();
         anim = this.gameObject.GetComponent<Animator>();
         rigidbodies = GetComponentsInChildren<Rigidbody>().ToList();
+        hips = GameObject.Find("Hips");
+        
     }
 
     // Update is called once per frame
@@ -26,7 +29,11 @@ public class RagdollController : MonoBehaviour
 
     public void EnableRagdoll(bool enable)
     {
-        Debug.Log(rigidbodies);
+        if (enable == false) {
+            transform.transform.position = hips.transform.position;
+
+        }
+
         for (int i = 0; i < rigidbodies.Count; i++)
         {
             rigidbodies[i].isKinematic = !enable;
