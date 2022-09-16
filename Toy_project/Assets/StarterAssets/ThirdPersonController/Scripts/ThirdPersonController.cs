@@ -215,6 +215,7 @@ namespace StarterAssets
 
         private void Move()
         {
+            //send ragdoll input to enable ragdoll script (RagdollController.cs)
             _ragdollController.EnableRagdoll(_input.ragdoll);
             // set target speed based on move speed, sprint speed and if sprint is pressed
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
@@ -256,6 +257,7 @@ namespace StarterAssets
 
             // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is a move input rotate player when the player is moving
+            // Do not rotate player if the player is ragdolled.
             if (_input.move != Vector2.zero && !_input.ragdoll)
             {
                 _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
