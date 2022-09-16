@@ -280,6 +280,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b1df694400d09846bc4ededa9f1e209, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isRagdoll: 0
 --- !u!54 &295200717
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3797,7 +3798,7 @@ MonoBehaviour:
   GroundedRadius: 0.28
   GroundLayers:
     serializedVersion: 2
-    m_Bits: 513
+    m_Bits: 1
   CinemachineCameraTarget: {fileID: 8338988566420741730}
   TopClamp: 70
   BottomClamp: -30
