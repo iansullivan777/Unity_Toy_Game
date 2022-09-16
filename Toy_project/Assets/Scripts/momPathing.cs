@@ -5,11 +5,13 @@ using UnityEngine;
 public class momPathing : MonoBehaviour
 {
     // Start is called before the first frame update
+	
 	private float waitTime = 3.0f;
     private float timer = 0.0f;
 	bool readyToStop = false;
 	bool wait = false;
 
+	
 	bool direction = true;
 	int coinflip;
 	public Transform player;
@@ -21,15 +23,19 @@ public class momPathing : MonoBehaviour
 	int lastDest;
 	
 	void Start () {
+		
 		UnityEngine.AI.NavMeshAgent agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         agent.destination = navPoint[0].position; 
 		agent.speed = 100;
+		
 		//readyToStop = false;
 	}
 	
 	void Update () {
 
+		
 		if(wait){
+			
 			timer += Time.deltaTime;
 			// Check if we have reached beyond 2 seconds.
 			// Subtracting two is more accurate over time than resetting to zero.
@@ -41,6 +47,7 @@ public class momPathing : MonoBehaviour
 				GotoNextPoint();
 				timer =  0;
 			}
+			
 		}
 		
 		if(!wait){
@@ -63,11 +70,14 @@ public class momPathing : MonoBehaviour
 	
 	void GotoNextPoint()
 	{
+		
+		
 		if (navPoint.Length == 0)
 			return;     
 		
 
 		//random destination
+		
 		/*
 		destPoint = Random.Range(0, navPoint.Length - 1);
 		if(destPoint == lastDest){
@@ -152,16 +162,15 @@ public class momPathing : MonoBehaviour
 			}
 
 			//choose whether or not to break path
+			
 			if(destPoint == 2){
-				Debug.Log("decided to go to table");
 				coinflip = Random.Range(0, 2);
-				Debug.Log(coinflip);
 				if(coinflip == 1){
 					//table
 					destPoint = 16;
 				}
 			}
-
+			
 			if(destPoint == 4 || destPoint == 13){
 				coinflip = Random.Range(0, 2);
 				if(coinflip == 1){
@@ -193,7 +202,7 @@ public class momPathing : MonoBehaviour
 			if(destPoint == 9){
 				coinflip = Random.Range(0, 2);
 				if(coinflip == 1){
-					//fridge
+					//countertopB
 					destPoint = 18;
 				}
 			} 
@@ -226,6 +235,7 @@ public class momPathing : MonoBehaviour
 		if(navPoint[destPoint].name == "counterA" || navPoint[destPoint].name == "counterB"||navPoint[destPoint].name == "table"){
 			readyToStop = true;
 		}
+		
 	}
 
 }
