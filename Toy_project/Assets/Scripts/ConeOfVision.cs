@@ -23,7 +23,7 @@ public class ConeOfVision : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(GetComponent<Camera>().gameObject);
+        //Debug.Log(GetComponent<Camera>().gameObject);
         Plane[] planes = GeometryUtility.CalculateFrustumPlanes(GetComponent<Camera>());
         foreach (Collider col in playerColliders) {
             

@@ -28,7 +28,7 @@ public class rotationtest : MonoBehaviour
 	private IEnumerator LookAt(){
         
 
-        Debug.Log("i'm looking :)")
+        Debug.Log("i'm looking :)");
 		Quaternion lookRotation = Quaternion.Euler(0f, goalAngle, 0f);
 
 		float time = 0;
@@ -46,7 +46,8 @@ public class rotationtest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Quaternion lookRotation = Quaternion.Euler(0f, goalAngle, 0f);
+        transform.rotation = Quaternion.Euler(0f, goalAngle, 0f);
+        
         goalAngle++;
         if(goalAngle > 360){
             goalAngle = 0;

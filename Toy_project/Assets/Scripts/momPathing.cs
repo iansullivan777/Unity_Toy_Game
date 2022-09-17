@@ -11,6 +11,10 @@ public class momPathing : MonoBehaviour
 	bool readyToStop = false;
 	bool wait = false;
 
+	float goalAngle = 0;
+	float currentangle = 0;
+	float turnsp = .2f;
+	bool setturndirec;
 	
 	bool direction = true;
 	int coinflip;
@@ -32,10 +36,31 @@ public class momPathing : MonoBehaviour
 	}
 	
 	void Update () {
-
 		
 		if(wait){
 			
+			if(setturndirec){
+				curreangle = transform.rotation.y;
+				if(currentangle > goalAngle){
+					if(currentangle - goalAngle < 180f){
+						turnsp = -turnsp;
+					}
+				}
+				else{
+					if(goalAngle  - currentangle > 180f){
+						turnsp = -turnsp;
+					}
+				}
+				setturndirec = false;
+			}
+
+			if(currentangle > goalAngle + .5f || currentangle < goalAngle - .5f){
+					currentangle += turnsp;
+					if(currentangle > 360 || currentangle < 0){
+						currentangle = 0;
+					}
+			}
+			transform.rotation = Quaternion.Euler(0f, currentangle, 0f);
 			timer += Time.deltaTime;
 			// Check if we have reached beyond 2 seconds.
 			// Subtracting two is more accurate over time than resetting to zero.
@@ -54,6 +79,7 @@ public class momPathing : MonoBehaviour
 			
 			if(agent.remainingDistance < 0.5f){
 				if(readyToStop){
+					turnsp = .2f;
 					wait = true;
 					agent.speed = 0;
 				}
@@ -130,6 +156,7 @@ public class momPathing : MonoBehaviour
 					destPoint = 8;
 				}
 			}
+			
 			//fridge is located at 11
 			if(navPoint[destPoint].name == "fridge"){
 				if(direction){
@@ -139,6 +166,7 @@ public class momPathing : MonoBehaviour
 					destPoint = 10;
 				}
 			}
+
 			//shortcut is at 3 OR 12
 			if(navPoint[destPoint].name == "shortcut"){
 				if(direction){
@@ -168,6 +196,7 @@ public class momPathing : MonoBehaviour
 				if(coinflip == 1){
 					//table
 					destPoint = 16;
+					goalAngle = 315f;
 				}
 			}
 			
@@ -183,7 +212,7 @@ public class momPathing : MonoBehaviour
 				coinflip = Random.Range(0, 2);
 				if(coinflip == 1){
 					//sink
-					destPoint = 20;
+					goalAngle = 180f;
 				}
 			}
 
@@ -192,10 +221,12 @@ public class momPathing : MonoBehaviour
 				if(coinflip == 1){
 					//oven
 					destPoint = 21;
+					goalAngle = 180f;
 				}
 				if(coinflip == 2){
 					//counter spot A
 					destPoint = 17;
+					goalAngle = 0f;
 				}
 			}
 
@@ -204,6 +235,7 @@ public class momPathing : MonoBehaviour
 				if(coinflip == 1){
 					//countertopB
 					destPoint = 18;
+					goalAngle = 0f;
 				}
 			} 
 
@@ -212,9 +244,15 @@ public class momPathing : MonoBehaviour
 				if(coinflip == 1){
 					//fridge
 					destPoint = 22;
+					goalAngle = 270f;
 				}
 			} 
-			
+
+			currentangle = transform.eulerAngles.y;
+			setturndirec = true;
+			if(currentangle < 0){
+				currentangle += 360f;
+			}
 			if(navPoint[destPoint].name == "start"){
 				direction = !direction;
 			}
