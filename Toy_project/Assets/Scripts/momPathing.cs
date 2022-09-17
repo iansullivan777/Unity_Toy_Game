@@ -20,12 +20,11 @@ public class momPathing : MonoBehaviour
 	float currentangle = 0;
 	float turnsp = .4f;
 	bool setturndirec;
-	
-
 
 	public Transform player;
-	
-	ConeOfVision visionscript;
+	float Speed = 1f;
+	private Coroutine LookCoroutine;
+
 
 	//for the navmesh + pathing
 	bool direction = true;
@@ -43,33 +42,46 @@ public class momPathing : MonoBehaviour
 	float playerDistance;
 	float grabRange = 20f;
 	float AIMoveSpeed = 10f;
+	int count = 0;
+
 	void Start () {
 
 		UnityEngine.AI.NavMeshAgent agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         agent.destination = navPoint[0].position; 
-		agent.speed = 100;
+		agent.speed = 50f;
 		
 		//readyToStop = false;
 	}
 	private void OnEnable(){
 
 		ConeOfVision.onDetectionNormal += ISeeYou;
-		ConeOfVision.onDetectionRagdoll += ISeeYou;
+		//ConeOfVision.onDetectionRagdoll += ISeeYou;
+		ConeOfVision.NotSaw += whereyougo;
 	}
 
 	private void OnDisable(){
 
 		ConeOfVision.onDetectionNormal -= ISeeYou;
-		ConeOfVision.onDetectionRagdoll -= ISeeYou;
+		ConeOfVision.NotSaw -= whereyougo;
+		//ConeOfVision.onDetectionRagdoll -= ISeeYou;
 	}
 
 	void ISeeYou(){
-		Debug.Log("I see you");
 		seen = true;
+
+	}
+
+	void whereyougo(){
+		if(seen){
+			wait = false;
+			readyToStop = false;
+			agent.speed = 50;
+			GotoNextPoint();
+		}
+		seen = false;
 	}
 
 	void Update () {
-		
 		if(!seen){
 			if(wait){
 				if(setturndirec){
@@ -89,67 +101,88 @@ public class momPathing : MonoBehaviour
 					setturndirec = false;
 				}
 
-			if(currentangle > goalAngle + .5f || currentangle < goalAngle - .5f){
+				if(currentangle > goalAngle + .5f || currentangle < goalAngle - .5f){
 					currentangle += turnsp;
 					if(currentangle > 360 || currentangle < 0){
 						currentangle = 0;
 					}
-			}
-
-			transform.rotation = Quaternion.Euler(0f, currentangle, 0f);
-			timer += Time.deltaTime;
-			// Check if we have reached beyond 2 seconds.
-			// Subtracting two is more accurate over time than resetting to zero.
-			if(timer > waitTime)
-			{
-				wait = false;
-				readyToStop = false;
-				agent.speed = 100;
-				GotoNextPoint();
-				timer =  0;
-			}
-			
-		}
-		
-		if(!wait){
-			iswalking = true;
-			isidle = false;
-			if(agent.remainingDistance < 0.5f){
-				if(readyToStop){
-					turnsp = .4f;
-					wait = true;
-					agent.speed = 0;
 				}
-				if(!readyToStop){
+
+				transform.rotation = Quaternion.Euler(0f, currentangle, 0f);
+				timer += Time.deltaTime;
+				// Check if we have reached beyond 2 seconds.
+				// Subtracting two is more accurate over time than resetting to zero.
+				if(timer > waitTime)
+				{
+					wait = false;
+					readyToStop = false;
+					agent.speed = 100;
 					GotoNextPoint();
+					timer =  0;
+				}
+			
+			}
+		
+			if(!wait){
+				iswalking = true;
+				isidle = false;
+				if(agent.remainingDistance < 0.5f){
+					if(readyToStop){
+						turnsp = .4f;
+						wait = true;
+						agent.speed = 0;
+					}
+					if(!readyToStop){
+						GotoNextPoint();
+					}
+					
 				}
 				
 			}
-			
-		}
 		}
 		
 		playerDistance = Vector3.Distance(player.position, transform.position);
 
 		if(seen){
-			LookAtPlayer();
-			Chase();
-		}
-		
-		if(playerDistance < grabRange){
-			isgrabbed = true;
+			//Debug.Log("i'm staring at you theortically");
+			Quaternion lookRotation = Quaternion.LookRotation(player.position - transform.position);
+			Debug.Log(lookRotation.y);
+			//StartRotating();
+			//Chase();
+			if(playerDistance < grabRange){
+				isgrabbed = true;
+			}
 		}
 		
 	}
 	
+	private void StartRotating(){
+		if(LookCoroutine != null){
+			StopCoroutine(LookCoroutine);
+		}
 
-	void LookAtPlayer()
+		LookCoroutine = StartCoroutine(LookAtPlayer());
+	}
+
+	private IEnumerator LookAtPlayer()
 	{
-		transform.LookAt(player);	
+  		Quaternion lookRotation = Quaternion.LookRotation(player.position - transform.position);
+
+		float time = 0;
+
+		while (time < 1){
+			
+			transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, time);
+
+			time += Time.deltaTime * Speed;
+
+			yield return null;
+			
+		}
 	}
 
 	void Chase(){
-		transform.Translate(Vector3.forward * AIMoveSpeed * Time.deltaTime);
+		//transform.Translate(Vector3.forward * AIMoveSpeed * Time.deltaTime);
 	}
 
 	void GotoNextPoint()
