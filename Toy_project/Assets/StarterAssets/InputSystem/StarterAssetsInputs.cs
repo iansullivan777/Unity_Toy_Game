@@ -38,7 +38,6 @@ namespace StarterAssets
 
 		public void OnJump(InputValue value)
 		{
-            if (ragdoll) return;
 			JumpInput(value.isPressed);
 		}
 
