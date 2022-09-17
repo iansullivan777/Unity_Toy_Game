@@ -1,58 +1,93 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using UnityEngine.Events;
 
 public class momPathing : MonoBehaviour
 {
     // Start is called before the first frame update
 	
+	//timer + stopping variables
 	private float waitTime = 3.0f;
     private float timer = 0.0f;
 	bool readyToStop = false;
 	bool wait = false;
 
+
+	//turning to face whatever stop location is reached
 	float goalAngle = 0;
 	float currentangle = 0;
-	float turnsp = .2f;
+	float turnsp = .4f;
 	bool setturndirec;
 	
+
+
+	public Transform player;
+	
+	ConeOfVision visionscript;
+
+	//for the navmesh + pathing
 	bool direction = true;
 	int coinflip;
-	public Transform player;
-	public float playerDistance;
-	
 	public Transform[] navPoint;
 	public UnityEngine.AI.NavMeshAgent agent;
 	public int destPoint = 0;
 	int lastDest;
-	
+
+	//animation bools
+	public bool isgrabbed, iswalking, isidle, seen;
+
+	//chasing player
+	float attentionTime = 5f;
+	float playerDistance;
+	float grabRange = 20f;
+	float AIMoveSpeed = 10f;
 	void Start () {
-		
+
 		UnityEngine.AI.NavMeshAgent agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         agent.destination = navPoint[0].position; 
 		agent.speed = 100;
 		
 		//readyToStop = false;
 	}
-	
+	private void OnEnable(){
+
+		ConeOfVision.onDetectionNormal += ISeeYou;
+		ConeOfVision.onDetectionRagdoll += ISeeYou;
+	}
+
+	private void OnDisable(){
+
+		ConeOfVision.onDetectionNormal -= ISeeYou;
+		ConeOfVision.onDetectionRagdoll -= ISeeYou;
+	}
+
+	void ISeeYou(){
+		Debug.Log("I see you");
+		seen = true;
+	}
+
 	void Update () {
 		
-		if(wait){
-			
-			if(setturndirec){
-				curreangle = transform.rotation.y;
-				if(currentangle > goalAngle){
-					if(currentangle - goalAngle < 180f){
-						turnsp = -turnsp;
+		if(!seen){
+			if(wait){
+				if(setturndirec){
+					isidle = true;
+					iswalking = false;
+					currentangle = transform.eulerAngles.y;
+					if(currentangle > goalAngle){
+						if(currentangle - goalAngle < 180f){
+							turnsp = -turnsp;
+						}
 					}
-				}
-				else{
-					if(goalAngle  - currentangle > 180f){
-						turnsp = -turnsp;
+					else{
+						if(goalAngle  - currentangle > 180f){
+							turnsp = -turnsp;
+						}
 					}
+					setturndirec = false;
 				}
-				setturndirec = false;
-			}
 
 			if(currentangle > goalAngle + .5f || currentangle < goalAngle - .5f){
 					currentangle += turnsp;
@@ -60,6 +95,7 @@ public class momPathing : MonoBehaviour
 						currentangle = 0;
 					}
 			}
+
 			transform.rotation = Quaternion.Euler(0f, currentangle, 0f);
 			timer += Time.deltaTime;
 			// Check if we have reached beyond 2 seconds.
@@ -76,10 +112,11 @@ public class momPathing : MonoBehaviour
 		}
 		
 		if(!wait){
-			
+			iswalking = true;
+			isidle = false;
 			if(agent.remainingDistance < 0.5f){
 				if(readyToStop){
-					turnsp = .2f;
+					turnsp = .4f;
 					wait = true;
 					agent.speed = 0;
 				}
@@ -90,10 +127,31 @@ public class momPathing : MonoBehaviour
 			}
 			
 		}
+		}
 		
+		playerDistance = Vector3.Distance(player.position, transform.position);
+
+		if(seen){
+			LookAtPlayer();
+			Chase();
+		}
+		
+		if(playerDistance < grabRange){
+			isgrabbed = true;
+		}
 		
 	}
 	
+
+	void LookAtPlayer()
+	{
+		transform.LookAt(player);	
+	}
+
+	void Chase(){
+		transform.Translate(Vector3.forward * AIMoveSpeed * Time.deltaTime);
+	}
+
 	void GotoNextPoint()
 	{
 		
@@ -156,7 +214,7 @@ public class momPathing : MonoBehaviour
 					destPoint = 8;
 				}
 			}
-			
+
 			//fridge is located at 11
 			if(navPoint[destPoint].name == "fridge"){
 				if(direction){
@@ -196,7 +254,7 @@ public class momPathing : MonoBehaviour
 				if(coinflip == 1){
 					//table
 					destPoint = 16;
-					goalAngle = 315f;
+					goalAngle = 300f;
 				}
 			}
 			
@@ -275,5 +333,4 @@ public class momPathing : MonoBehaviour
 		}
 		
 	}
-
 }

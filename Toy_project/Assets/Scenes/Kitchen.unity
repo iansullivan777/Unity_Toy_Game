@@ -927,7 +927,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1815231332}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &651050283
 Camera:
@@ -984,6 +984,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21f6a1855ec33344188caa1dcc7b0739, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDetectedWhileRagdoll: 0
   playerGOS: []
   playerColliders: []
   ragdollController: {fileID: 262111727}
@@ -1526,6 +1527,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Speed: 1
+  goalAngle: 90
 --- !u!1 &936143245 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 281855664364225751, guid: ad382b1b5fd52be4a8c544bf0c2bce20, type: 3}
@@ -2676,6 +2678,7 @@ Transform:
   m_LocalScale: {x: 5, y: 48.196354, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 826207159}
   - {fileID: 651050281}
   m_Father: {fileID: 0}
   m_RootOrder: 4
