@@ -1,35 +1,102 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using UnityEngine.Events;
 
 public class momPathing : MonoBehaviour
 {
     // Start is called before the first frame update
+	
+	//timer + stopping variables
 	private float waitTime = 3.0f;
     private float timer = 0.0f;
 	bool readyToStop = false;
 	bool wait = false;
 
+
+	//turning to face whatever stop location is reached
+	float goalAngle = 0;
+	float currentangle = 0;
+	float turnsp = .4f;
+	bool setturndirec;
+	
+
+
+	public Transform player;
+	
+	ConeOfVision visionscript;
+
+	//for the navmesh + pathing
 	bool direction = true;
 	int coinflip;
-	public Transform player;
-	public float playerDistance;
-	
 	public Transform[] navPoint;
 	public UnityEngine.AI.NavMeshAgent agent;
 	public int destPoint = 0;
 	int lastDest;
-	
+
+	//animation bools
+	public bool isgrabbed, iswalking, isidle, seen;
+
+	//chasing player
+	float attentionTime = 5f;
+	float playerDistance;
+	float grabRange = 20f;
+	float AIMoveSpeed = 10f;
 	void Start () {
+
 		UnityEngine.AI.NavMeshAgent agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         agent.destination = navPoint[0].position; 
 		agent.speed = 100;
+		
 		//readyToStop = false;
 	}
-	
-	void Update () {
+	private void OnEnable(){
 
-		if(wait){
+		ConeOfVision.onDetectionNormal += ISeeYou;
+		ConeOfVision.onDetectionRagdoll += ISeeYou;
+	}
+
+	private void OnDisable(){
+
+		ConeOfVision.onDetectionNormal -= ISeeYou;
+		ConeOfVision.onDetectionRagdoll -= ISeeYou;
+	}
+
+	void ISeeYou(){
+		Debug.Log("I see you");
+		seen = true;
+	}
+
+	void Update () {
+		
+		if(!seen){
+			if(wait){
+				if(setturndirec){
+					isidle = true;
+					iswalking = false;
+					currentangle = transform.eulerAngles.y;
+					if(currentangle > goalAngle){
+						if(currentangle - goalAngle < 180f){
+							turnsp = -turnsp;
+						}
+					}
+					else{
+						if(goalAngle  - currentangle > 180f){
+							turnsp = -turnsp;
+						}
+					}
+					setturndirec = false;
+				}
+
+			if(currentangle > goalAngle + .5f || currentangle < goalAngle - .5f){
+					currentangle += turnsp;
+					if(currentangle > 360 || currentangle < 0){
+						currentangle = 0;
+					}
+			}
+
+			transform.rotation = Quaternion.Euler(0f, currentangle, 0f);
 			timer += Time.deltaTime;
 			// Check if we have reached beyond 2 seconds.
 			// Subtracting two is more accurate over time than resetting to zero.
@@ -41,12 +108,15 @@ public class momPathing : MonoBehaviour
 				GotoNextPoint();
 				timer =  0;
 			}
+			
 		}
 		
 		if(!wait){
-			
+			iswalking = true;
+			isidle = false;
 			if(agent.remainingDistance < 0.5f){
 				if(readyToStop){
+					turnsp = .4f;
 					wait = true;
 					agent.speed = 0;
 				}
@@ -57,17 +127,41 @@ public class momPathing : MonoBehaviour
 			}
 			
 		}
+		}
 		
+		playerDistance = Vector3.Distance(player.position, transform.position);
+
+		if(seen){
+			LookAtPlayer();
+			Chase();
+		}
+		
+		if(playerDistance < grabRange){
+			isgrabbed = true;
+		}
 		
 	}
 	
+
+	void LookAtPlayer()
+	{
+		transform.LookAt(player);	
+	}
+
+	void Chase(){
+		transform.Translate(Vector3.forward * AIMoveSpeed * Time.deltaTime);
+	}
+
 	void GotoNextPoint()
 	{
+		
+		
 		if (navPoint.Length == 0)
 			return;     
 		
 
 		//random destination
+		
 		/*
 		destPoint = Random.Range(0, navPoint.Length - 1);
 		if(destPoint == lastDest){
@@ -120,6 +214,7 @@ public class momPathing : MonoBehaviour
 					destPoint = 8;
 				}
 			}
+
 			//fridge is located at 11
 			if(navPoint[destPoint].name == "fridge"){
 				if(direction){
@@ -129,6 +224,7 @@ public class momPathing : MonoBehaviour
 					destPoint = 10;
 				}
 			}
+
 			//shortcut is at 3 OR 12
 			if(navPoint[destPoint].name == "shortcut"){
 				if(direction){
@@ -152,16 +248,16 @@ public class momPathing : MonoBehaviour
 			}
 
 			//choose whether or not to break path
+			
 			if(destPoint == 2){
-				Debug.Log("decided to go to table");
 				coinflip = Random.Range(0, 2);
-				Debug.Log(coinflip);
 				if(coinflip == 1){
 					//table
 					destPoint = 16;
+					goalAngle = 300f;
 				}
 			}
-
+			
 			if(destPoint == 4 || destPoint == 13){
 				coinflip = Random.Range(0, 2);
 				if(coinflip == 1){
@@ -174,7 +270,7 @@ public class momPathing : MonoBehaviour
 				coinflip = Random.Range(0, 2);
 				if(coinflip == 1){
 					//sink
-					destPoint = 20;
+					goalAngle = 180f;
 				}
 			}
 
@@ -183,18 +279,21 @@ public class momPathing : MonoBehaviour
 				if(coinflip == 1){
 					//oven
 					destPoint = 21;
+					goalAngle = 180f;
 				}
 				if(coinflip == 2){
 					//counter spot A
 					destPoint = 17;
+					goalAngle = 0f;
 				}
 			}
 
 			if(destPoint == 9){
 				coinflip = Random.Range(0, 2);
 				if(coinflip == 1){
-					//fridge
+					//countertopB
 					destPoint = 18;
+					goalAngle = 0f;
 				}
 			} 
 
@@ -203,9 +302,15 @@ public class momPathing : MonoBehaviour
 				if(coinflip == 1){
 					//fridge
 					destPoint = 22;
+					goalAngle = 270f;
 				}
 			} 
-			
+
+			currentangle = transform.eulerAngles.y;
+			setturndirec = true;
+			if(currentangle < 0){
+				currentangle += 360f;
+			}
 			if(navPoint[destPoint].name == "start"){
 				direction = !direction;
 			}
@@ -226,6 +331,6 @@ public class momPathing : MonoBehaviour
 		if(navPoint[destPoint].name == "counterA" || navPoint[destPoint].name == "counterB"||navPoint[destPoint].name == "table"){
 			readyToStop = true;
 		}
+		
 	}
-
 }

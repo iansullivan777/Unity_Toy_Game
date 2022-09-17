@@ -14,11 +14,13 @@ public class ConeOfVision : MonoBehaviour
     public static event DetectionNormal onDetectionNormal;
 
     public bool isDetectedWhileRagdoll;
+
     public List<GameObject> playerGOS;
     public List<Collider> playerColliders;
     [SerializeField] RagdollController ragdollController;
     public int LayerMask = 36; //00100100 ignore the sixth and third layer (character and its ragdoll)
     // Start is called before the first frame update
+
     void Start()
     {
         playerGOS = GameObject.FindGameObjectsWithTag("Player").ToList();
@@ -29,11 +31,12 @@ public class ConeOfVision : MonoBehaviour
         }
 
     }
-
+    
     // Update is called once per frame
+
     void Update()
     {
-        Debug.Log(GetComponent<Camera>().gameObject);
+        //Debug.Log(GetComponent<Camera>().gameObject);
         Plane[] planes = GeometryUtility.CalculateFrustumPlanes(GetComponent<Camera>());
         foreach (Collider col in playerColliders) {
             if (ragdollController.isRagdoll) {
