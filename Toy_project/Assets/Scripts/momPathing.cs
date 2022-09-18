@@ -25,6 +25,7 @@ public class momPathing : MonoBehaviour
 	Vector3 playerpos;
 	float Speed = 1f;
 	private Coroutine LookCoroutine;
+    MomAnimationController momAnimationController;
 
 
 	//for the navmesh + pathing
@@ -50,7 +51,7 @@ public class momPathing : MonoBehaviour
 	int count = 0;
 
 	void Start () {
-		
+        momAnimationController = GetComponent<MomAnimationController>();
 		UnityEngine.AI.NavMeshAgent agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         agent.destination = navPoint[0].position; 
 		agent.speed = 50f;
@@ -89,8 +90,22 @@ public class momPathing : MonoBehaviour
 	}
 
 	void Update(){
-		
-		if(!seen){
+
+        if (isgrabbed)
+        {
+            momAnimationController.BeginGrabbing();
+        }
+        else if (iswalking)
+        {
+            momAnimationController.BeginWalking();
+        }
+        else if (isidle)
+        {
+            momAnimationController.BeginIdle();
+        }
+
+
+        if (!seen){
 			if(wait){
 				if(setturndirec){
 					isidle = true;

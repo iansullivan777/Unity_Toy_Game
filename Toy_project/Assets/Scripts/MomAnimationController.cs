@@ -16,17 +16,17 @@ public class MomAnimationController : MonoBehaviour
     {
     }
 
-    void BeginWalking()
+    public void BeginWalking()
     {
         anim.SetBool("IsWalking", true);
     }
 
-    void BeginGrabbing()
+    public void BeginGrabbing()
     {
         anim.SetBool("IsGrabbing", true);
     }
     
-    void BeginIdle()
+    public void BeginIdle()
     {
         anim.SetBool("IsIdle", true);
     }
