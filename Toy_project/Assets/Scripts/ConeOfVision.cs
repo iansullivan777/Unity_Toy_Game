@@ -13,12 +13,18 @@ public class ConeOfVision : MonoBehaviour
     public delegate void DetectionNormal();
     public static event DetectionNormal onDetectionNormal;
 
+    public delegate void CeaseDetection();
+    public static event CeaseDetection onCeaseDetection;
+
     public bool isDetectedWhileRagdoll;
+
+    bool prevRagdollDetection;
+    bool prevNormalDetection;
 
     public List<GameObject> playerGOS;
     public List<Collider> playerColliders;
     [SerializeField] RagdollController ragdollController;
-    public int LayerMask = 36; //00100100 ignore the sixth and third layer (character and its ragdoll)
+    //00100100 ignore the sixth and third layer (character and its ragdoll)
     // Start is called before the first frame update
 
     void Start()
@@ -31,11 +37,13 @@ public class ConeOfVision : MonoBehaviour
         }
 
     }
-    
+
     // Update is called once per frame
 
     void Update()
     {
+        bool detectedRagdoll = false;
+        bool detectedNormal = false;
         //Debug.Log(GetComponent<Camera>().gameObject);
         Plane[] planes = GeometryUtility.CalculateFrustumPlanes(GetComponent<Camera>());
         foreach (Collider col in playerColliders) {
@@ -53,20 +61,36 @@ public class ConeOfVision : MonoBehaviour
             }
 
             //check to see if the players box collider is inside of the frustum.
-            if(GeometryUtility.TestPlanesAABB(planes, col.bounds)){
-                // if it is send a raycast from the camera to the player, ignoring player and its ragdoll
-                if (Physics.Raycast(transform.position, col.gameObject.transform.position, LayerMask)){
-                    if(isDetectedWhileRagdoll && onDetectionRagdoll != null)
+            if (GeometryUtility.TestPlanesAABB(planes, col.bounds)) {
+                // if it is send a raycast from the camera to the player, ignoring player and its ragdoll\
+
+                if (Physics.Raycast(transform.position, col.gameObject.transform.position, LayerMask.GetMask(""))) {
+                    if (isDetectedWhileRagdoll && onDetectionRagdoll != null)
                     {
                         //Listener & Delegate behavior.
-                        onDetectionRagdoll();
+
+                        detectedRagdoll = true;
                     }
-                    else if(onDetectionNormal != null)
+                    else if (onDetectionNormal != null)
                     {
-                        onDetectionNormal();
+                        Debug.Log(col.gameObject.name);
+                        detectedRagdoll = true;
                     }
+                    Debug.Log(col.gameObject.name);
                 }
             }
         }
+        {
+            onDetectionNormal();
+        }
+        else if (detectedRagdoll)
+        {
+            onDetectionRagdoll();
+        }
+        else if ((prevNormalDetection && !detectedNormal) || (prevRagdollDetection && !detectedRagdoll) && onCeaseDetection !=null){
+            onCeaseDetection();
+        }
+        prevNormalDetection = detectedNormal;
+        prevRagdollDetection = detectedRagdoll;
     }
 }
