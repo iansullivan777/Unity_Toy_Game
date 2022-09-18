@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 
-public class StartGameButton : MonoBehaviour
+public class ChangeSceneButton : MonoBehaviour
 {
     public Button startButton;
     public string sceneName;
