@@ -20,10 +20,12 @@ public class MomAnimationController : MonoBehaviour
     {
         anim.SetBool("IsWalking", true);
     }
+
     void BeginGrabbing()
     {
         anim.SetBool("IsGrabbing", true);
     }
+    
     void BeginIdle()
     {
         anim.SetBool("IsIdle", true);

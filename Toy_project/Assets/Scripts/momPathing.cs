@@ -21,7 +21,8 @@ public class momPathing : MonoBehaviour
 	float turnsp = .4f;
 	bool setturndirec;
 
-	public Transform player;
+	public GameObject player;
+	Vector3 playerpos;
 	float Speed = 1f;
 	private Coroutine LookCoroutine;
 
@@ -37,20 +38,23 @@ public class momPathing : MonoBehaviour
 	//animation bools
 	public bool isgrabbed, iswalking, isidle, seen;
 
+
 	//chasing player
+	public bool chasing = false;
+	float chasertimer = 0;
+	int MoveSpeed = 50;
 	float attentionTime = 5f;
 	float playerDistance;
-	float grabRange = 20f;
+	float grabRange = 25f;
 	float AIMoveSpeed = 10f;
 	int count = 0;
 
 	void Start () {
-
+		
 		UnityEngine.AI.NavMeshAgent agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         agent.destination = navPoint[0].position; 
 		agent.speed = 50f;
 		
-		//readyToStop = false;
 	}
 	private void OnEnable(){
 
@@ -68,20 +72,22 @@ public class momPathing : MonoBehaviour
 
 	void ISeeYou(){
 		seen = true;
-
+		agent.isStopped = true;
 	}
 
 	void whereyougo(){
 		if(seen){
 			wait = false;
 			readyToStop = false;
-			agent.speed = 50;
-			GotoNextPoint();
+			agent.speed = 50f;
+			//GotoNextPoint();
 		}
+		//if seen was recently set to true, don't set it to false until a couple second have passed
 		seen = false;
 	}
 
-	void Update () {
+	void Update(){
+		
 		if(!seen){
 			if(wait){
 				if(setturndirec){
@@ -116,14 +122,14 @@ public class momPathing : MonoBehaviour
 				{
 					wait = false;
 					readyToStop = false;
-					agent.speed = 100;
+					agent.speed = 50f;
 					GotoNextPoint();
 					timer =  0;
 				}
 			
 			}
-		
-			if(!wait){
+			
+			if(!wait && !chasing){
 				iswalking = true;
 				isidle = false;
 				if(agent.remainingDistance < 0.5f){
@@ -135,50 +141,84 @@ public class momPathing : MonoBehaviour
 					if(!readyToStop){
 						GotoNextPoint();
 					}
-					
+			
 				}
 				
 			}
 		}
 		
-		playerDistance = Vector3.Distance(player.position, transform.position);
+			
 
+		
 		if(seen){
-			//Debug.Log("i'm staring at you theortically");
-			Quaternion lookRotation = Quaternion.LookRotation(player.position - transform.position);
-			Debug.Log(lookRotation.y);
-			//StartRotating();
-			//Chase();
+			setturndirec = true;
+			chasing = true;
+			Vector3 target = new Vector3(player.transform.position.x, transform.position.y,player.transform.position.z);
+			playerpos = player.transform.position;
+			transform.LookAt(target);
+			if (Vector3.Distance(transform.position, player.transform.position) >= grabRange - 5f)
+			{
+				transform.position += transform.forward * MoveSpeed * Time.deltaTime;
+			}
+
 			if(playerDistance < grabRange){
+				//Debug.Log("I grabbed you ;)");
 				isgrabbed = true;
 			}
 		}
 		
-	}
-	
-	private void StartRotating(){
-		if(LookCoroutine != null){
-			StopCoroutine(LookCoroutine);
-		}
+		if(chasing && !seen){
+			if (Vector3.Distance(transform.position, playerpos) >= 25f)
+			{
+				transform.position += transform.forward * MoveSpeed * Time.deltaTime;
+			}
+			else{
+				if(setturndirec){
+				goalAngle = Random.Range(0f, 360f);
+					isidle = true;
+					iswalking = false;
+					currentangle = transform.eulerAngles.y;
+					if(currentangle > goalAngle){
+						if(currentangle - goalAngle < 180f){
+							turnsp = -turnsp;
+						}
+					}
+					else{
+						if(goalAngle  - currentangle > 180f){
+							turnsp = -turnsp;
+						}
+					}
+					setturndirec = false;
+				}
 
-		LookCoroutine = StartCoroutine(LookAtPlayer());
-	}
-
-	private IEnumerator LookAtPlayer()
-	{
-  		Quaternion lookRotation = Quaternion.LookRotation(player.position - transform.position);
-
-		float time = 0;
-
-		while (time < 1){
+				if(currentangle > goalAngle + .5f || currentangle < goalAngle - .5f){
+					currentangle += turnsp * .3f;
+					if(currentangle > 360 || currentangle < 0){
+							currentangle = 0;
+					}
+				}
+				else{
+					setturndirec = true;
+				}
+				transform.rotation = Quaternion.Euler(0f, currentangle, 0f);
+			}
+			chasertimer += Time.deltaTime;
+				// Check if we have reached beyond 2 seconds.
+				// Subtracting two is more accurate over time than resetting to zero.
+			if(chasertimer > attentionTime)
+			{
+				agent.isStopped = false;
+				chasing = false;
+				wait = false;
+				readyToStop = false;
+				agent.speed = 50f;
+				GotoNextPoint();
+				chasertimer =  0;
+			}
 			
-			transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, time);
-
-			time += Time.deltaTime * Speed;
-
-			yield return null;
-			
 		}
+		
+		
 	}
 
 	void Chase(){
@@ -187,8 +227,6 @@ public class momPathing : MonoBehaviour
 
 	void GotoNextPoint()
 	{
-		
-		
 		if (navPoint.Length == 0)
 			return;     
 		

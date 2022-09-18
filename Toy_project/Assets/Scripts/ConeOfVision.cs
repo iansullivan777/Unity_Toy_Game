@@ -76,7 +76,6 @@ public class ConeOfVision : MonoBehaviour
                         onDetectionNormal();
                     }
                 }
-                
                 else{
                     NotSaw();
                 }
