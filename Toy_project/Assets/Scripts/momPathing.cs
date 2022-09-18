@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 public class momPathing : MonoBehaviour
 {
@@ -90,6 +91,10 @@ public class momPathing : MonoBehaviour
 
         if (isgrabbed)
         {
+			isgrabbed = false;
+			iswalking = false;
+			isidle = false;
+			SceneManager.LoadScene("GameEnd_Victory");
             momAnimationController.BeginGrabbing();
         }
         else if (iswalking)
@@ -167,10 +172,12 @@ public class momPathing : MonoBehaviour
 			Vector3 target = new Vector3(player.transform.position.x, transform.position.y,player.transform.position.z);
 			playerpos = player.transform.position;
 			transform.LookAt(target);
-			if (Vector3.Distance(transform.position, player.transform.position) >= grabRange - 5f)
+			playerDistance = Vector3.Distance(transform.position, player.transform.position);
+			if (playerDistance >= grabRange - 5f)
 			{
 				transform.position += transform.forward * MoveSpeed * Time.deltaTime;
 			}
+			Debug.Log(playerDistance);
 			if(playerDistance < grabRange){
 				//Debug.Log("I grabbed you ;)");
 				isgrabbed = true;
