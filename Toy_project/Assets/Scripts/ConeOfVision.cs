@@ -66,10 +66,12 @@ public class ConeOfVision : MonoBehaviour
             //check to see if the players box collider is inside of the frustum.
             if (GeometryUtility.TestPlanesAABB(planes, col.bounds)) {
                 // if it is send a raycast from the camera to the player, ignoring player and its ragdoll\
-                Debug.Log("in bounds");
+                //Debug.Log("in bounds");
+                
                 RaycastHit hit;
                 Vector3 directionToPlayer = -(transform.position - col.gameObject.transform.position).normalized * Vector3.Distance(transform.position, col.gameObject.transform.position);
-                if (Physics.Raycast(transform.position, directionToPlayer , layerMask) ) {
+                //Debug.Log(Physics.Raycast(transform.position, directionToPlayer , layerMask));
+                if (Physics.Raycast(transform.position, directionToPlayer , layerMask)) {
                     if (isDetectedWhileRagdoll && onDetectionRagdoll != null)
                     {
                         //Listener & Delegate behavior.
@@ -78,27 +80,21 @@ public class ConeOfVision : MonoBehaviour
                     }
                     else if (onDetectionNormal != null)
                     {
-                        Debug.Log(col.gameObject.name);
-                        detectedRagdoll = true;
+                        //Debug.Log("player detected");
+                        detectedNormal = true;
                     }
                 }
-                else{
-                    NotSaw();
-                }
-                
-            }
-            else{
-                NotSaw();
             }
         }
-        if (detectedNormal){ 
+        if (detectedNormal && onDetectionNormal != null){ 
             onDetectionNormal();
         }
-        else if (detectedRagdoll)
+        else if (detectedRagdoll && onDetectionRagdoll != null)
         {
             onDetectionRagdoll();
         }
         else if ((prevNormalDetection && !detectedNormal) || (prevRagdollDetection && !detectedRagdoll) && onCeaseDetection !=null){
+            Debug.Log("callling");
             onCeaseDetection();
         }
         prevNormalDetection = detectedNormal;

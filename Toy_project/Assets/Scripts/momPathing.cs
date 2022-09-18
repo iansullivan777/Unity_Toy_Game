@@ -60,22 +60,24 @@ public class momPathing : MonoBehaviour
 
 		ConeOfVision.onDetectionNormal += ISeeYou;
 		//ConeOfVision.onDetectionRagdoll += ISeeYou;
-		ConeOfVision.NotSaw += whereyougo;
+		ConeOfVision.onCeaseDetection += whereyougo;
 	}
 
 	private void OnDisable(){
 
 		ConeOfVision.onDetectionNormal -= ISeeYou;
-		ConeOfVision.NotSaw -= whereyougo;
+		ConeOfVision.onCeaseDetection -= whereyougo;
 		//ConeOfVision.onDetectionRagdoll -= ISeeYou;
 	}
 
 	void ISeeYou(){
+		Debug.Log("I see you");
 		seen = true;
 		agent.isStopped = true;
 	}
 
 	void whereyougo(){
+		Debug.Log("I don't see you :(");
 		if(seen){
 			wait = false;
 			readyToStop = false;
