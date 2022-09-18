@@ -164,18 +164,19 @@ public class momPathing : MonoBehaviour
 				
 			}
 		}
-
-		Vector3 target = new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z);
+		
 		if(seen){
-			playerpos = target;
 			setturndirec = true;
 			chasing = true;
-			playerDistance = Vector3.Distance(transform.position, target);
+			Vector3 target = new Vector3(player.transform.position.x, transform.position.y,player.transform.position.z);
+			playerpos = player.transform.position;
 			transform.LookAt(target);
+			playerDistance = Vector3.Distance(transform.position, player.transform.position);
 			if (playerDistance >= grabRange - 5f)
 			{
 				transform.position += transform.forward * MoveSpeed * Time.deltaTime;
 			}
+			Debug.Log(playerDistance);
 			if(playerDistance < grabRange){
 				//Debug.Log("I grabbed you ;)");
 				isgrabbed = true;
