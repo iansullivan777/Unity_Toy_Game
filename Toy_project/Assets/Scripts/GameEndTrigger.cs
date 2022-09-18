@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameEndTrigger : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class GameEndTrigger : MonoBehaviour
     {
         if (other.gameObject == player)
         {
-            Debug.Log("hello");
+            SceneManager.LoadScene("GameEnd_Victory", LoadSceneMode.Single);
         }
     }
 
