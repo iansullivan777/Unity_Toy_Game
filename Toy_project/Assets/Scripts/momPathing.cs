@@ -14,7 +14,6 @@ public class momPathing : MonoBehaviour
 	bool readyToStop = false;
 	bool wait = false;
 
-
 	//turning to face whatever stop location is reached
 	float goalAngle = 0;
 	float currentangle = 0;
@@ -24,8 +23,6 @@ public class momPathing : MonoBehaviour
 	public GameObject player;
 	Vector3 playerpos;
 	float Speed = 1f;
-	private Coroutine LookCoroutine;
-
 
 	//for the navmesh + pathing
 	bool direction = true;
@@ -71,13 +68,11 @@ public class momPathing : MonoBehaviour
 	}
 
 	void ISeeYou(){
-		Debug.Log("I see you");
 		seen = true;
 		agent.isStopped = true;
 	}
 
 	void whereyougo(){
-		Debug.Log("I don't see you :(");
 		if(seen){
 			wait = false;
 			readyToStop = false;
@@ -149,9 +144,6 @@ public class momPathing : MonoBehaviour
 			}
 		}
 		
-			
-
-		
 		if(seen){
 			setturndirec = true;
 			chasing = true;
@@ -162,7 +154,6 @@ public class momPathing : MonoBehaviour
 			{
 				transform.position += transform.forward * MoveSpeed * Time.deltaTime;
 			}
-
 			if(playerDistance < grabRange){
 				//Debug.Log("I grabbed you ;)");
 				isgrabbed = true;
@@ -176,7 +167,7 @@ public class momPathing : MonoBehaviour
 			}
 			else{
 				if(setturndirec){
-				goalAngle = Random.Range(0f, 360f);
+					goalAngle = Random.Range(0f, 360f);
 					isidle = true;
 					iswalking = false;
 					currentangle = transform.eulerAngles.y;
@@ -192,7 +183,6 @@ public class momPathing : MonoBehaviour
 					}
 					setturndirec = false;
 				}
-
 				if(currentangle > goalAngle + .5f || currentangle < goalAngle - .5f){
 					currentangle += turnsp * .3f;
 					if(currentangle > 360 || currentangle < 0){
@@ -223,10 +213,6 @@ public class momPathing : MonoBehaviour
 		
 	}
 
-	void Chase(){
-		//transform.Translate(Vector3.forward * AIMoveSpeed * Time.deltaTime);
-	}
-
 	void GotoNextPoint()
 	{
 		if (navPoint.Length == 0)
@@ -250,7 +236,6 @@ public class momPathing : MonoBehaviour
 		//If 'mom' is at a special point or not (feel free to rewrite if you have a better solution)
 		//This big block of garbage is when mom was at special point, it picks out the correct spot on the main path to return to
 		if(destPoint > 15){
-			
 			//oven and counter A are located at 8
 			if(navPoint[destPoint].name == "oven" || navPoint[destPoint].name == "counterA"){
 				if(direction){
@@ -278,7 +263,6 @@ public class momPathing : MonoBehaviour
 					destPoint = 4;
 				}
 			}
-			
 			if(navPoint[destPoint].name == "counterB"){
 				if(direction){
 					destPoint = 10;
@@ -287,7 +271,6 @@ public class momPathing : MonoBehaviour
 					destPoint = 8;
 				}
 			}
-
 			//fridge is located at 11
 			if(navPoint[destPoint].name == "fridge"){
 				if(direction){
@@ -297,7 +280,6 @@ public class momPathing : MonoBehaviour
 					destPoint = 10;
 				}
 			}
-
 			//shortcut is at 3 OR 12
 			if(navPoint[destPoint].name == "shortcut"){
 				if(direction){
@@ -307,7 +289,6 @@ public class momPathing : MonoBehaviour
 					destPoint = 3;
 				}
 			}
-			
 		}
 		else{
 			
@@ -392,11 +373,7 @@ public class momPathing : MonoBehaviour
 			}
 
 		}
-
-
-
 		agent.destination = navPoint[destPoint].position;
-		
 		//Locations to stop and wait
 		if(navPoint[destPoint].name == "oven" || navPoint[destPoint].name == "sink" || navPoint[destPoint].name == "fridge"){
 			readyToStop = true;
