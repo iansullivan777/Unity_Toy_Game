@@ -43,10 +43,10 @@ public class momPathing : MonoBehaviour
 	//chasing player
 	public bool chasing = false;
 	float chasertimer = 0;
-	int MoveSpeed = 50;
+	int MoveSpeed = 10;
 	float attentionTime = 5f;
 	float playerDistance;
-	float grabRange = 25f;
+	float grabRange = 35f;
 	float AIMoveSpeed = 10f;
 	int count = 0;
 
@@ -54,7 +54,7 @@ public class momPathing : MonoBehaviour
         momAnimationController = GetComponent<MomAnimationController>();
 		UnityEngine.AI.NavMeshAgent agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         agent.destination = navPoint[0].position; 
-		agent.speed = 50f;
+		agent.speed = 10f;
 		
 	}
 	private void OnEnable(){
@@ -80,7 +80,7 @@ public class momPathing : MonoBehaviour
 		if(seen){
 			wait = false;
 			readyToStop = false;
-			agent.speed = 50f;
+			agent.speed = 10f;
 			//GotoNextPoint();
 		}
 		//if seen was recently set to true, don't set it to false until a couple second have passed
@@ -88,14 +88,13 @@ public class momPathing : MonoBehaviour
 	}
 
 	void Update(){
-
         if (isgrabbed)
         {
 			isgrabbed = false;
 			iswalking = false;
 			isidle = false;
-			SceneManager.LoadScene("GameEnd_Victory");
             momAnimationController.BeginGrabbing();
+            StartCoroutine(WaitUntilGrabOver());
         }
         else if (iswalking)
         {
@@ -141,7 +140,7 @@ public class momPathing : MonoBehaviour
 				{
 					wait = false;
 					readyToStop = false;
-					agent.speed = 50f;
+					agent.speed = 10f;
 					GotoNextPoint();
 					timer =  0;
 				}
@@ -227,7 +226,7 @@ public class momPathing : MonoBehaviour
 				chasing = false;
 				wait = false;
 				readyToStop = false;
-				agent.speed = 50f;
+				agent.speed = 10f;
 				GotoNextPoint();
 				chasertimer =  0;
 			}
@@ -407,4 +406,9 @@ public class momPathing : MonoBehaviour
 		}
 		
 	}
+    IEnumerator WaitUntilGrabOver()
+    {
+        yield return new WaitForSeconds(5f);
+        SceneManager.LoadScene("GameEnd_Victory");
+    }
 }
